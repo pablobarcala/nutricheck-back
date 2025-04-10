@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "zYhv6S8qBNfO1q9FIeFRnF3rkP8D3buFg2ctUe/P3zk=",
+  "Source": "NutriCheck.Backend",
+  "BasePath": "_content/NutriCheck.Backend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
