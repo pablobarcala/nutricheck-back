@@ -28,6 +28,12 @@ Este es el backend del sistema NutriCheck, desarrollado en C# con ASP.NET Core W
 - [x] `GET /api/comidas?fecha=yyyy-MM-dd` → Consultar comidas de todos los pacientes por fecha
 - [x] Respuesta incluye nombre del paciente, tipo de comida, alimento, calorías y fecha
 
+### 🍽️ Platos de comida
+
+- [x] Modelo `PlatoComida` con relación a `Nutricionista`
+- [x] Endpoint `POST /api/nutricionista/comidas/crear` → Crea un nuevo plato
+- [x] Permite guardar: nombre, ingredientes, receta opcional, calorías y proteínas aproximadas
+
 ---
 
 ## 🛠️ Tecnologías utilizadas
