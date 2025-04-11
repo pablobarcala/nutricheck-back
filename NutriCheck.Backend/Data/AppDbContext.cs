@@ -13,6 +13,8 @@ namespace NutriCheck.Data
         public DbSet<Paciente> Pacientes { get; set; }
         public DbSet<Nutricionista> Nutricionistas { get; set; }
         public DbSet<Comida> Comidas { get; set; }
+        public DbSet<PlatoComida> PlatosComida { get; set; }
+
 
 
 
