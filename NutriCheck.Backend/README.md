@@ -21,6 +21,13 @@ Este es el backend del sistema NutriCheck, desarrollado en C# con ASP.NET Core W
 - [x] `POST /api/auth/login` → Inicio de sesión básico con email y password
 - [x] Validación simple sin tokens por ahora
 
+### Comidas
+
+- [x] Modelo `Comida` con relación a paciente
+- [x] `POST /api/comidas` → Registrar comida por paciente
+- [x] `GET /api/comidas?fecha=yyyy-MM-dd` → Consultar comidas de todos los pacientes por fecha
+- [x] Respuesta incluye nombre del paciente, tipo de comida, alimento, calorías y fecha
+
 ---
 
 ## 🛠️ Tecnologías utilizadas
