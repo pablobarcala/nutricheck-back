@@ -1,4 +1,9 @@
-## ✅ Funcionalidades implementadas hasta ahora
+# 🥗 NutriCheck - Backend
+
+Este es el backend del sistema NutriCheck, desarrollado en C# con ASP.NET Core Web API.
+
+
+## ✅ Funcionalidades implementadas
 
 ### Pacientes
 
@@ -6,8 +11,15 @@
 - [x] `POST /api/pacientes` → Registro de nuevos pacientes
 - [x] `GET /api/pacientes` → Listado general de pacientes registrados
 - [x] `PUT /api/pacientes/{id}` → Edición de paciente existente
-- [x] `DELETE /api/pacientes/{id}` → Eliminación de paciente por ID
+- [x] `DELETE /api/pacientes/{id}` → Eliminación de paciente
 - [x] Swagger configurado para probar la API fácilmente
+
+### Nutricionistas
+
+- [x] Modelo `Nutricionista` (Id, Nombre, Email, Password)
+- [x] Precarga automática de nutricionista de prueba en memoria
+- [x] `POST /api/auth/login` → Inicio de sesión básico con email y password
+- [x] Validación simple sin tokens por ahora
 
 ---
 
@@ -17,25 +29,8 @@
 - .NET 7
 - ASP.NET Core Web API
 - Entity Framework Core (InMemory)
-- Swagger (auto-documentación)
+- Swagger
 - Git / GitHub
-
----
-
-## 📌 Próximas tareas por implementar
-
-### Backend
-
-- [ ] Endpoint `PUT /api/pacientes/{id}` para editar pacientes
-- [ ] Endpoint `DELETE /api/pacientes/{id}` para eliminar pacientes
-- [ ] Validaciones de entrada (campos obligatorios, rangos válidos, etc.)
-- [ ] Agregar autenticación básica o JWT (login de nutricionista)
-- [ ] Migrar de base InMemory a base real (SQLite o SQL Server)
-
-### Organización
-
-- [ ] Crear rama `develop` y empezar a trabajar en `feature/*`
-- [ ] Subir cambios del mockup de Figma y conectarlo con el backend
 
 ---
 
