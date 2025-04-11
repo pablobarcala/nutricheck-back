@@ -11,5 +11,7 @@ namespace NutriCheck.Data
         }
 
         public DbSet<Paciente> Pacientes { get; set; }
+        public DbSet<Nutricionista> Nutricionistas { get; set; }
+
     }
 }
