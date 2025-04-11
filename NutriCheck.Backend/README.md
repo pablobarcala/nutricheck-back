@@ -5,6 +5,8 @@
 - [x] Modelo `Paciente` con: nombre, edad, género, altura, peso, objetivo y nutricionistaId
 - [x] `POST /api/pacientes` → Registro de nuevos pacientes
 - [x] `GET /api/pacientes` → Listado general de pacientes registrados
+- [x] `PUT /api/pacientes/{id}` → Edición de paciente existente
+- [x] `DELETE /api/pacientes/{id}` → Eliminación de paciente por ID
 - [x] Swagger configurado para probar la API fácilmente
 
 ---
