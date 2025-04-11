@@ -16,19 +16,28 @@ namespace NutriCheck.Controllers
             _context = context;
         }
 
-        // POST: Registrar comida
+        /// <summary>
+        /// Registra una comida consumida por un paciente en un momento del día.
+        /// </summary>
+        /// <param name="comida">Datos de la comida (paciente, tipo, nombre, calorías, fecha)</param>
+        /// <returns>Comida registrada</returns>
         [HttpPost]
-        public async Task<ActionResult<Comida>> RegistrarComida(Comida comida)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<Comida>> RegistrarComida([FromBody] Comida comida)
         {
             _context.Comidas.Add(comida);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(RegistrarComida), new { id = comida.Id }, comida);
         }
 
-        // GET: Obtener comidas por fecha
+        /// <summary>
+        /// Devuelve las comidas registradas en una fecha específica, agrupadas por paciente.
+        /// </summary>
+        /// <param name="fecha">Fecha a consultar (formato: yyyy-MM-dd)</param>
+        /// <returns>Lista de comidas agrupadas por paciente para ese día</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<object>> ObtenerComidasPorFecha([FromQuery] DateTime fecha)
-
         {
             var comidas = _context.Comidas
                 .Where(c => c.Fecha.Date == fecha.Date)
