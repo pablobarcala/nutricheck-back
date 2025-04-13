@@ -2,8 +2,12 @@ using NutriCheck.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using NutriCheck.Models;
+using QuestPDF.Infrastructure; // 👈 Asegúrate de tener este using
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurar licencia de QuestPDF
+QuestPDF.Settings.License = LicenseType.Community; // 👈 Esta línea es la clave
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -11,7 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// 👇 Acá agregamos la configuración para leer los comentarios XML
+// 👇 Configuración para leer los comentarios XML
 builder.Services.AddSwaggerGen(options =>
 {
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -48,7 +52,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();

@@ -56,5 +56,31 @@ namespace NutriCheck.Controllers
 
             return Ok(resultado);
         }
+
+        /// <summary>
+        /// Devuelve las comidas faltantes para un paciente en una fecha específica.
+        /// Los tipos de comidas esperados son: Desayuno, Almuerzo, Merienda y Cena.
+        /// </summary>
+        /// <param name="pacienteId">ID del paciente para el cual se consultarán las comidas faltantes</param>
+        /// <param name="fecha">Fecha a consultar (formato: yyyy-MM-dd)</param>
+        /// <returns>Lista de tipos de comidas faltantes para ese paciente y fecha</returns>
+        [HttpGet("faltantes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<string>> ObtenerComidasFaltantes(
+            [FromQuery] int pacienteId, [FromQuery] DateTime fecha)
+        {
+            var tiposEsperados = new[] { "Desayuno", "Almuerzo", "Merienda", "Cena" };
+
+            var tiposRegistrados = _context.Comidas
+                .Where(c => c.PacienteId == pacienteId && c.Fecha.Date == fecha.Date)
+                .Select(c => c.Tipo)
+                .ToList();
+
+            var faltantes = tiposEsperados
+                .Where(tipo => !tiposRegistrados.Contains(tipo, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            return Ok(faltantes);
+        }
     }
 }
