@@ -2,7 +2,8 @@ using NutriCheck.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using NutriCheck.Models;
-using QuestPDF.Infrastructure; // 👈 Asegúrate de tener este using
+using QuestPDF.Infrastructure;
+using NutriCheck.Backend; // 👈 Asegúrate de tener este using
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 QuestPDF.Settings.License = LicenseType.Community; // 👈 Esta línea es la clave
 
 // Add services to the container.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("NutriCheckDb")); // Base temporal para pruebas
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseInMemoryDatabase("NutriCheckDb")); // Base temporal para pruebas
 builder.Services.AddControllers();
+builder.Services.AddSingleton<MongoDBConnection>();
 builder.Services.AddEndpointsApiExplorer();
 
 // 👇 Configuración para leer los comentarios XML
@@ -26,23 +28,23 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Precarga de nutricionista de prueba
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//using (var scope = app.Services.CreateScope())
+//{
+//    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    // Agregar nutricionista solo si no existe
-    if (!db.Nutricionistas.Any())
-    {
-        db.Nutricionistas.Add(new Nutricionista
-        {
-            Nombre = "Martin Sanchez",
-            Email = "martin@nutricheck.com",
-            Password = "1234" // Por ahora sin encriptar
-        });
+//    // Agregar nutricionista solo si no existe
+//    if (!db.Nutricionistas.Any())
+//    {
+//        db.Nutricionistas.Add(new Nutricionista
+//        {
+//            Nombre = "Martin Sanchez",
+//            Email = "martin@nutricheck.com",
+//            Password = "1234" // Por ahora sin encriptar
+//        });
 
-        db.SaveChanges();
-    }
-}
+//        db.SaveChanges();
+//    }
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
