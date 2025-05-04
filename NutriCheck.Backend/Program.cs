@@ -1,9 +1,7 @@
-using NutriCheck.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using NutriCheck.Models;
+using NutriCheck.Backend;
+using NutriCheck.Backend.Repositories; // 👈 Asegúrate de tener este using
+using NutriCheck.Backend.Services;
 using QuestPDF.Infrastructure;
-using NutriCheck.Backend; // 👈 Asegúrate de tener este using
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +14,9 @@ QuestPDF.Settings.License = LicenseType.Community; // 👈 Esta línea es la cla
 builder.Services.AddControllers();
 builder.Services.AddSingleton<MongoDBConnection>();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // 👇 Configuración para leer los comentarios XML
 builder.Services.AddSwaggerGen(options =>

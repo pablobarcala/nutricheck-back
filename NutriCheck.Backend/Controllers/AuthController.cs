@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using NutriCheck.Models;
-using NutriCheck.Data;
+using NutriCheck.Backend.Dtos;
+using NutriCheck.Backend.Services;
 
 namespace NutriCheck.Controllers
 {
@@ -8,25 +8,43 @@ namespace NutriCheck.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IUserService _userService;
 
-        public AuthController(AppDbContext context)
+        public AuthController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] Nutricionista login)
+        [HttpPost("register")]
+        public async Task<ActionResult<bool>> Register([FromBody] RegistroUserDto user)
         {
-            var usuario = _context.Nutricionistas
-                .FirstOrDefault(n => n.Email == login.Email && n.Password == login.Password);
-
-            if (usuario == null)
+            if (user == null)
             {
-                return Unauthorized("Email o contraseña incorrectos");
+                return BadRequest("Usuario no válido");
             }
 
-            return Ok($"Bienvenido, {usuario.Nombre}!");
+            var response = await _userService.RegistrarUsuarioAsync(user);
+
+            if (!response)
+            {
+                return BadRequest("El usuario ya existe");
+            }
+
+            return Ok("Usuario registrado correctamente");
         }
+
+        //[HttpPost("login")]
+        //public IActionResult Login([FromBody] Nutricionista login)
+        //{
+        //    var usuario = _context.Nutricionistas
+        //        .FirstOrDefault(n => n.Email == login.Email && n.Password == login.Password);
+
+        //    if (usuario == null)
+        //    {
+        //        return Unauthorized("Email o contraseña incorrectos");
+        //    }
+
+        //    return Ok($"Bienvenido, {usuario.Nombre}!");
+        //}
     }
 }
