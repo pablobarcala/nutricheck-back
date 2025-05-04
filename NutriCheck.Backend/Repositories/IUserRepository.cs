@@ -6,5 +6,6 @@ namespace NutriCheck.Backend.Repositories
     {
         Task<bool> GuardarUsuarioAsync(User user);
         Task<bool> UsuarioExisteConMailAsync(string email);
+        Task<User?> ObtenerUsuarioPorEmailAsync(string email);
     }
 }

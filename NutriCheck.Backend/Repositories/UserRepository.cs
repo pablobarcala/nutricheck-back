@@ -26,5 +26,13 @@ namespace NutriCheck.Backend.Repositories
             var user = await _users.Find(filter).FirstOrDefaultAsync();
             return user != null;
         }
+
+        // Método para obtener usuario por email
+        public async Task<User?> ObtenerUsuarioPorEmailAsync(string email)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Email, email);
+            var user = await _users.Find(filter).FirstOrDefaultAsync();
+            return user;
+        }
     }
 }

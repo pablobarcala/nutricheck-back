@@ -33,18 +33,22 @@ namespace NutriCheck.Controllers
             return Ok("Usuario registrado correctamente");
         }
 
-        //[HttpPost("login")]
-        //public IActionResult Login([FromBody] Nutricionista login)
-        //{
-        //    var usuario = _context.Nutricionistas
-        //        .FirstOrDefault(n => n.Email == login.Email && n.Password == login.Password);
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> Login([FromBody] LoginUserDto user)
+        {
+            if (user == null)
+            {
+                return BadRequest("Usuario necesario");
+            }
 
-        //    if (usuario == null)
-        //    {
-        //        return Unauthorized("Email o contraseña incorrectos");
-        //    }
+            var token = await _userService.LoginUsuarioAsync(user);
 
-        //    return Ok($"Bienvenido, {usuario.Nombre}!");
-        //}
+            if (token == null)
+            {
+                return Unauthorized("Email o contraseña incorrectos");
+            }
+
+            return Ok(token);
+        }
     }
 }

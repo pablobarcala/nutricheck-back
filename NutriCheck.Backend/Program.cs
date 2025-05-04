@@ -2,6 +2,8 @@ using NutriCheck.Backend;
 using NutriCheck.Backend.Repositories; // 👈 Asegúrate de tener este using
 using NutriCheck.Backend.Services;
 using QuestPDF.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,18 @@ QuestPDF.Settings.License = LicenseType.Community; // 👈 Esta línea es la cla
 builder.Services.AddControllers();
 builder.Services.AddSingleton<MongoDBConnection>();
 builder.Services.AddEndpointsApiExplorer();
+
+string? value = builder.Configuration.GetSection("Token").Value;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(value)),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
