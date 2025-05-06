@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using NutriCheck.Backend.Dtos;
 using NutriCheck.Backend.Models;
+using NutriCheck.Models;
 
 namespace NutriCheck.Backend.Repositories
 {
@@ -33,6 +34,23 @@ namespace NutriCheck.Backend.Repositories
             var filter = Builders<User>.Filter.Eq(u => u.Email, email);
             var user = await _users.Find(filter).FirstOrDefaultAsync();
             return user;
+        }
+
+        // Método para obtener usuario por ID
+        public async Task<User?> ObtenerUsuarioPorIdAsync(string id)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, id);
+            var user = await _users.Find(filter).FirstOrDefaultAsync();
+            return user;
+        }
+
+        // Método para guardar datos del paciente
+        public async Task<bool> GuardarDatosPacienteAsync(string userId, Paciente datosPaciente)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update.Set(u => u.Paciente, datosPaciente);
+            var result = await _users.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
         }
     }
 }

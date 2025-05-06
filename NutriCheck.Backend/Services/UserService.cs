@@ -91,6 +91,7 @@ namespace NutriCheck.Backend.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim("email", user.Email),
+                new Claim("rol", user.Rol)
             };
 
             var token = new JwtSecurityToken(
@@ -100,6 +101,21 @@ namespace NutriCheck.Backend.Services
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<bool> GuardarDatosPaciente(string userId, GuardarDatosPacienteDto datosPaciente)
+        {
+            var datos = new NutriCheck.Models.Paciente
+            {
+                Actividad = datosPaciente.Actividad,
+                Altura = datosPaciente.Altura,
+                Sexo = datosPaciente.Sexo,
+                Peso = datosPaciente.Peso,
+                FechaNacimiento = datosPaciente.FechaNacimiento,
+                Calorias = datosPaciente.Calorias
+            };
+
+            return await _userRepository.GuardarDatosPacienteAsync(userId, datos);
         }
     }
 }

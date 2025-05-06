@@ -40,6 +40,19 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 
+// Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirVarios", policy =>
+    {
+        policy.SetIsOriginAllowed(origin =>
+            origin == "http://localhost:3000")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Precarga de nutricionista de prueba
@@ -69,6 +82,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("PermitirVarios");
 app.UseAuthorization();
 
 app.MapControllers();

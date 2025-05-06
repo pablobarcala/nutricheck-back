@@ -15,7 +15,7 @@ namespace NutriCheck.Controllers
             _userService = userService;
         }
 
-        [HttpPost("register")]
+        [HttpPost("registro")]
         public async Task<ActionResult<bool>> Register([FromBody] RegistroUserDto user)
         {
             if (user == null)
@@ -30,7 +30,13 @@ namespace NutriCheck.Controllers
                 return BadRequest("El usuario ya existe");
             }
 
-            return Ok("Usuario registrado correctamente");
+            var token = await _userService.LoginUsuarioAsync(new LoginUserDto
+            {
+                Email = user.Email,
+                Password = user.Password
+            });
+
+            return Ok(token);
         }
 
         [HttpPost("login")]

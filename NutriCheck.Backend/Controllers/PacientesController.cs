@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NutriCheck.Backend.Dtos;
+using NutriCheck.Backend.Services;
+using System.Security.Claims;
 
 namespace NutriCheck.Controllers
 {
@@ -6,12 +10,39 @@ namespace NutriCheck.Controllers
     [Route("api/[controller]")]
     public class PacientesController : ControllerBase
     {
+        private readonly IUserService _userService;
         //private readonly AppDbContext _context;
 
-        //public PacientesController(AppDbContext context)
-        //{
-        //    _context = context;
-        //}
+        public PacientesController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [Authorize]
+        [HttpPost("guardar-datos")]
+        public async Task<ActionResult<string>> GuardarDatosPaciente([FromBody] GuardarDatosPacienteDto datosPaciente)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest("El ID de usuario no es válido.");
+            }
+
+            if (datosPaciente == null)
+            {
+                return BadRequest("Los datos del paciente son obligatorios.");
+            }
+
+            var response = await _userService.GuardarDatosPaciente(userId, datosPaciente);
+
+            if (!response)
+            {
+                return BadRequest("Error al guardar los datos del paciente.");
+            }
+
+            return Ok("Datos del paciente guardados correctamente.");
+        }
 
         /// <summary>
         /// Crea un nuevo paciente y lo asocia a un nutricionista.
