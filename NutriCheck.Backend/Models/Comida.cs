@@ -6,10 +6,10 @@ namespace NutriCheck.Models
     {
         [BsonId]
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [BsonElement("nutricionistaId")]
-        public string NutricionistaId { get; set; }
+        public string? NutricionistaId { get; set; }
 
         [BsonElement("tipo")]
         public string? Tipo { get; set; } // Desayuno, Almuerzo, Merienda, Cena
@@ -26,7 +26,7 @@ namespace NutriCheck.Models
         [BsonElement("grasas")]
         public int Grasas { get; set; } // En gramos
 
-        [BsonElement("calorias")]
-        public int Calorias { get; set; }
+        [BsonElement("kcal")]
+        public int Kcal { get; set; }
     }
 }

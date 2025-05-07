@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NutriCheck.Backend.Services;
+using NutriCheck.Models;
+using System.Security.Claims;
 
 namespace NutriCheck.Controllers
 {
@@ -6,12 +10,64 @@ namespace NutriCheck.Controllers
     [Route("api/[controller]")]
     public class ComidasController : ControllerBase
     {
-        //private readonly AppDbContext _context;
+        private readonly IComidaService _comidaService;
 
-        //public ComidasController(AppDbContext context)
-        //{
-        //    _context = context;
-        //}
+        public ComidasController(IComidaService comidaService)
+        {
+            _comidaService = comidaService;
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPost("crear")]
+        public async Task<ActionResult<string>> CrearComida([FromBody] Comida comida)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            comida.NutricionistaId = userId;
+
+            if (comida == null)
+            {
+                return BadRequest("La comida no puede ser nula.");
+            }
+            try
+            {
+                var resultado = await _comidaService.CrearComidaAsync(comida);
+                if (resultado)
+                {
+                    return Ok("Comida creada exitosamente.");
+                }
+                else
+                {
+                    return StatusCode(500, "Error al crear la comida.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpGet("comidas-de-nutricionista")]
+        public async Task<ActionResult<string>> VerComidasDeNutricionista()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest("El ID de usuario no es válido.");
+            }
+
+            try
+            {
+                var comidas = await _comidaService.ObtenerComidasPorNutricionistaAsync(userId);
+
+                return Ok(comidas);
+            } catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// Registra una comida consumida por un paciente en un momento del día.

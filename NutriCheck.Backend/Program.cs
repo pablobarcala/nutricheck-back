@@ -32,6 +32,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<IComidaRepository, ComidaRepository>();
+builder.Services.AddScoped<IComidaService, ComidaService>();
+
 // 👇 Configuración para leer los comentarios XML
 builder.Services.AddSwaggerGen(options =>
 {

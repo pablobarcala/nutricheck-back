@@ -91,7 +91,7 @@ namespace NutriCheck.Backend.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim("email", user.Email),
-                new Claim("rol", user.Rol)
+                new Claim("role", user.Rol)
             };
 
             var token = new JwtSecurityToken(
