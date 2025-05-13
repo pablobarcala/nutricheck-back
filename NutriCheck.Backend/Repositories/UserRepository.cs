@@ -52,5 +52,14 @@ namespace NutriCheck.Backend.Repositories
             var result = await _users.UpdateOneAsync(filter, update);
             return result.ModifiedCount > 0;
         }
+
+        // Método para editar usuario
+        public async Task<bool> EditarUsuarioAsync(User user)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+            var update = Builders<User>.Update.Set(u => u, user);
+            var result = await _users.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
     }
 }

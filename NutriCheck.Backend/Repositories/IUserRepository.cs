@@ -11,5 +11,6 @@ namespace NutriCheck.Backend.Repositories
         Task<User?> ObtenerUsuarioPorEmailAsync(string email);
         Task<User?> ObtenerUsuarioPorIdAsync(string id);
         Task<bool> GuardarDatosPacienteAsync(string id, Paciente datosPaciente);
+        Task<bool> EditarUsuarioAsync(User user);
     }
 }

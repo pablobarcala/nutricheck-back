@@ -117,5 +117,14 @@ namespace NutriCheck.Backend.Services
 
             return await _userRepository.GuardarDatosPacienteAsync(userId, datos);
         }
+
+        public async Task<bool> AgregarPacienteEnNutricionistaAsync(string nutricionistaId, string pacienteId)
+        {
+            var nutricionista = await _userRepository.ObtenerUsuarioPorIdAsync(nutricionistaId);
+
+            nutricionista.Nutricionista.Pacientes.Add(pacienteId);
+
+            return await _userRepository.EditarUsuarioAsync(nutricionista);
+        }
     }
 }
