@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NutriCheck.Backend.Services;
 using NutriCheck.Models;
-using NutriCheck.Data;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace NutriCheck.Controllers
 {
@@ -9,11 +10,63 @@ namespace NutriCheck.Controllers
     [Route("api/[controller]")]
     public class ComidasController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IComidaService _comidaService;
 
-        public ComidasController(AppDbContext context)
+        public ComidasController(IComidaService comidaService)
         {
-            _context = context;
+            _comidaService = comidaService;
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPost("crear")]
+        public async Task<ActionResult<string>> CrearComida([FromBody] Comida comida)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            comida.NutricionistaId = userId;
+
+            if (comida == null)
+            {
+                return BadRequest("La comida no puede ser nula.");
+            }
+            try
+            {
+                var resultado = await _comidaService.CrearComidaAsync(comida);
+                if (resultado)
+                {
+                    return Ok("Comida creada exitosamente.");
+                }
+                else
+                {
+                    return StatusCode(500, "Error al crear la comida.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpGet("comidas-de-nutricionista")]
+        public async Task<ActionResult<string>> VerComidasDeNutricionista()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest("El ID de usuario no es válido.");
+            }
+
+            try
+            {
+                var comidas = await _comidaService.ObtenerComidasPorNutricionistaAsync(userId);
+
+                return Ok(comidas);
+            } catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -21,41 +74,41 @@ namespace NutriCheck.Controllers
         /// </summary>
         /// <param name="comida">Datos de la comida (paciente, tipo, nombre, calorías, fecha)</param>
         /// <returns>Comida registrada</returns>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<Comida>> RegistrarComida([FromBody] Comida comida)
-        {
-            _context.Comidas.Add(comida);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(RegistrarComida), new { id = comida.Id }, comida);
-        }
+        //[HttpPost]
+        //[ProducesResponseType(StatusCodes.Status201Created)]
+        //public async Task<ActionResult<Comida>> RegistrarComida([FromBody] Comida comida)
+        //{
+        //    _context.Comidas.Add(comida);
+        //    await _context.SaveChangesAsync();
+        //    return CreatedAtAction(nameof(RegistrarComida), new { id = comida.Id }, comida);
+        //}
 
         /// <summary>
         /// Devuelve las comidas registradas en una fecha específica, agrupadas por paciente.
         /// </summary>
         /// <param name="fecha">Fecha a consultar (formato: yyyy-MM-dd)</param>
         /// <returns>Lista de comidas agrupadas por paciente para ese día</returns>
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<object>> ObtenerComidasPorFecha([FromQuery] DateTime fecha)
-        {
-            var comidas = _context.Comidas
-                .Where(c => c.Fecha.Date == fecha.Date)
-                .Include(c => c.Paciente)
-                .ToList();
+        //[HttpGet]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public ActionResult<IEnumerable<object>> ObtenerComidasPorFecha([FromQuery] DateTime fecha)
+        //{
+        //    var comidas = _context.Comidas
+        //        .Where(c => c.Fecha.Date == fecha.Date)
+        //        .Include(c => c.Paciente)
+        //        .ToList();
 
-            var resultado = comidas.Select(c => new
-            {
-                c.PacienteId,
-                NombrePaciente = c.Paciente != null ? c.Paciente.Nombre : "Sin nombre",
-                c.Tipo,
-                c.Nombre,
-                c.Calorias,
-                Fecha = c.Fecha.ToShortDateString()
-            });
+        //    var resultado = comidas.Select(c => new
+        //    {
+        //        c.PacienteId,
+        //        NombrePaciente = c.Paciente != null ? c.Paciente.Nombre : "Sin nombre",
+        //        c.Tipo,
+        //        c.Nombre,
+        //        c.Calorias,
+        //        Fecha = c.Fecha.ToShortDateString()
+        //    });
 
-            return Ok(resultado);
-        }
+        //    return Ok(resultado);
+        //}
 
         /// <summary>
         /// Devuelve las comidas faltantes para un paciente en una fecha específica.
@@ -64,23 +117,23 @@ namespace NutriCheck.Controllers
         /// <param name="pacienteId">ID del paciente para el cual se consultarán las comidas faltantes</param>
         /// <param name="fecha">Fecha a consultar (formato: yyyy-MM-dd)</param>
         /// <returns>Lista de tipos de comidas faltantes para ese paciente y fecha</returns>
-        [HttpGet("faltantes")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<string>> ObtenerComidasFaltantes(
-            [FromQuery] int pacienteId, [FromQuery] DateTime fecha)
-        {
-            var tiposEsperados = new[] { "Desayuno", "Almuerzo", "Merienda", "Cena" };
+        //[HttpGet("faltantes")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public ActionResult<IEnumerable<string>> ObtenerComidasFaltantes(
+        //    [FromQuery] int pacienteId, [FromQuery] DateTime fecha)
+        //{
+        //    var tiposEsperados = new[] { "Desayuno", "Almuerzo", "Merienda", "Cena" };
 
-            var tiposRegistrados = _context.Comidas
-                .Where(c => c.PacienteId == pacienteId && c.Fecha.Date == fecha.Date)
-                .Select(c => c.Tipo)
-                .ToList();
+        //    var tiposRegistrados = _context.Comidas
+        //        .Where(c => c.PacienteId == pacienteId && c.Fecha.Date == fecha.Date)
+        //        .Select(c => c.Tipo)
+        //        .ToList();
 
-            var faltantes = tiposEsperados
-                .Where(tipo => !tiposRegistrados.Contains(tipo, StringComparer.OrdinalIgnoreCase))
-                .ToList();
+        //    var faltantes = tiposEsperados
+        //        .Where(tipo => !tiposRegistrados.Contains(tipo, StringComparer.OrdinalIgnoreCase))
+        //        .ToList();
 
-            return Ok(faltantes);
-        }
+        //    return Ok(faltantes);
+        //}
     }
 }

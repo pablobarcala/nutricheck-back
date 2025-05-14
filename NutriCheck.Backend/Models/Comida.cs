@@ -1,15 +1,32 @@
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace NutriCheck.Models
 {
     public class Comida
     {
-        public int Id { get; set; }
-        public int PacienteId { get; set; }
-        public string? Tipo { get; set; } // Desayuno, Almuerzo, Merienda, Cena
-        public string? Nombre { get; set; } // Ej: "Tostadas con queso"
-        public int Calorias { get; set; }
-        public DateTime Fecha { get; set; }
+        [BsonId]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        public string? Id { get; set; }
 
-        // Navegación opcional
-        public Paciente? Paciente { get; set; }
+        [BsonElement("nutricionistaId")]
+        public string? NutricionistaId { get; set; }
+
+        [BsonElement("tipo")]
+        public string? Tipo { get; set; } // Desayuno, Almuerzo, Merienda, Cena
+
+        [BsonElement("nombre")]
+        public string? Nombre { get; set; } // Ej: "Tostadas con queso"
+
+        [BsonElement("hidratos")]
+        public int Hidratos { get; set; } // En gramos
+
+        [BsonElement("proteinas")]
+        public int Proteinas { get; set; } // En gramos
+
+        [BsonElement("grasas")]
+        public int Grasas { get; set; } // En gramos
+
+        [BsonElement("kcal")]
+        public int Kcal { get; set; }
     }
 }

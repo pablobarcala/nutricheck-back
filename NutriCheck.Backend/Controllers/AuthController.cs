@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using NutriCheck.Models;
-using NutriCheck.Data;
+using NutriCheck.Backend.Dtos;
+using NutriCheck.Backend.Services;
 
 namespace NutriCheck.Controllers
 {
@@ -8,25 +8,53 @@ namespace NutriCheck.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IUserService _userService;
 
-        public AuthController(AppDbContext context)
+        public AuthController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
+        }
+
+        [HttpPost("registro")]
+        public async Task<ActionResult<bool>> Register([FromBody] RegistroUserDto user)
+        {
+            if (user == null)
+            {
+                return BadRequest("Usuario no válido");
+            }
+
+            var response = await _userService.RegistrarUsuarioAsync(user);
+
+            if (!response)
+            {
+                return BadRequest("El usuario ya existe");
+            }
+
+            var token = await _userService.LoginUsuarioAsync(new LoginUserDto
+            {
+                Email = user.Email,
+                Password = user.Password
+            });
+
+            return Ok(token);
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] Nutricionista login)
+        public async Task<ActionResult<string>> Login([FromBody] LoginUserDto user)
         {
-            var usuario = _context.Nutricionistas
-                .FirstOrDefault(n => n.Email == login.Email && n.Password == login.Password);
+            if (user == null)
+            {
+                return BadRequest("Usuario necesario");
+            }
 
-            if (usuario == null)
+            var token = await _userService.LoginUsuarioAsync(user);
+
+            if (token == null)
             {
                 return Unauthorized("Email o contraseña incorrectos");
             }
 
-            return Ok($"Bienvenido, {usuario.Nombre}!");
+            return Ok(token);
         }
     }
 }

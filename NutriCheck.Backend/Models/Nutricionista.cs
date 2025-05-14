@@ -1,10 +1,10 @@
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace NutriCheck.Models
 {
     public class Nutricionista
     {
-        public int Id { get; set; }
-        public string? Nombre { get; set; }
-        public string? Email { get; set; }
-        public string? Password { get; set; } // Simple por ahora
+        [BsonElement("pacientes")]
+        public List<string> Pacientes { get; set; } = new List<string>();
     }
 }
