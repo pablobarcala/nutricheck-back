@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NutriCheck.Backend.Dtos;
+using NutriCheck.Backend.Models;
 using NutriCheck.Backend.Services;
 using System.Security.Claims;
 
@@ -42,6 +43,28 @@ namespace NutriCheck.Controllers
             }
 
             return Ok("Datos del paciente guardados correctamente.");
+        }
+
+        [HttpGet("buscar/{busqueda}")]
+        public async Task<ActionResult<List<User>>> BuscarPacientes(string busqueda)
+        {
+            try
+            {
+                var usuarios = await _userService.BuscarPacientesPorNombre(busqueda);
+                return Ok(usuarios);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al buscar usuarios");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
         }
 
         /// <summary>

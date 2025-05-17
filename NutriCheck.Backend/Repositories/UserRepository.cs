@@ -44,6 +44,24 @@ namespace NutriCheck.Backend.Repositories
             return user;
         }
 
+        // Método para obtener usuarios por nombre de búsqueda
+        public async Task<List<User>?> ObtenerPacientesPorNombre(string nombre)
+        {
+            try
+            {
+                var filtro = Builders<User>.Filter.And(
+                    Builders<User>.Filter.Regex(u => u.Nombre, new MongoDB.Bson.BsonRegularExpression(nombre, "i")),
+                    Builders<User>.Filter.Eq(u => u.Rol, "paciente")
+                );
+
+                return await _users.Find(filtro).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error al buscar usuarios en la base de datos");
+            }
+        }
+
         // Método para guardar datos del paciente
         public async Task<bool> GuardarDatosPacienteAsync(string userId, Paciente datosPaciente)
         {
