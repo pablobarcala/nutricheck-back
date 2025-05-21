@@ -126,5 +126,7 @@ namespace NutriCheck.Backend.Services
 
             return await _userRepository.EditarUsuarioAsync(nutricionista);
         }
+
+        public async Task<List<User>?> BuscarPacientesPorNombre(string nombre) => await _userRepository.ObtenerPacientesPorNombre(nombre);
     }
 }
