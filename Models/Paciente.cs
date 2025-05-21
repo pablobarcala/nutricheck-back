@@ -4,9 +4,6 @@ namespace NutriCheck.Models
 {
     public class Paciente
     {
-        [BsonElement("nombre")]
-        public string Nombre { get; set; }
-
         [BsonElement("peso")]
         public float Peso { get; set; }
 
