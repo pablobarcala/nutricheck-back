@@ -1,7 +1,0 @@
-bin/
-obj/
-*.db
-*.pdb
-*.user
-*.suo
-.vscode/
