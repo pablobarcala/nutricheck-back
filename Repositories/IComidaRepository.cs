@@ -6,5 +6,6 @@ namespace NutriCheck.Backend.Repositories
     {
         Task<bool> CrearComidaAsync(Comida comida);
         Task<List<Comida>> ObtenerComidasPorNutricionistaAsync(string nutricionistaId);
+        Task<List<Comida>> ObtenerComidasPorIdsAsync(List<string> ids);
     }
 }

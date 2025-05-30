@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NutriCheck.Backend.Dtos;
+using NutriCheck.Backend.Models;
 using NutriCheck.Backend.Services;
+using NutriCheck.Models;
 using System.Security.Claims;
 
 namespace NutriCheck.Controllers
@@ -42,6 +44,157 @@ namespace NutriCheck.Controllers
             }
 
             return Ok("Datos del paciente guardados correctamente.");
+        }
+
+        [HttpGet("buscar")]
+        public async Task<ActionResult<List<PacienteBuscadoDto>>> BuscarPacientes([FromQuery] string nombre)
+        {
+            try
+            {
+                var usuarios = await _userService.BuscarPacientesPorNombre(nombre);
+                return Ok(usuarios);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al buscar usuarios");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [Authorize(Roles = "paciente")]
+        [HttpGet("comidas")]
+        public async Task<ActionResult<List<Comida>>> ObtenerComidasDePacienteLoggeado()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                var comidas = await _userService.ObtenerComidasDelPaciente(userId);
+                return Ok(comidas);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al buscar comidas");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [HttpGet("comidas/{pacienteId}")]
+        public async Task<ActionResult<List<Comida>>> ObtenerComidasDelPaciente(string pacienteId)
+        {
+            try
+            {
+                var comidas = await _userService.ObtenerComidasDelPaciente(pacienteId);
+                return Ok(comidas);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al buscar comidas");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPost("agregar-comida/{pacienteId}/{comidaId}")]
+        public async Task<ActionResult<bool>> AgregarComidaAPaciente(string pacienteId, string comidaId)
+        {
+            try
+            {
+                var response = await _userService.AgregarComidaAPaciente(pacienteId, comidaId);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al agregar comida");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [HttpGet("valores-nutricionales/{userId}")]
+        public async Task<ActionResult<ValoresNutricionalesDto>> ObtenerValoresNutricionalesPorId(string userId)
+        {
+            try
+            {
+                var valoresNutricionales = await _userService.ObtenerValoresNutricionalesDelPaciente(userId);
+                return Ok(valoresNutricionales);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al buscar valores nutricionales");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPost("editar-valores-nutricionales/{userId}")]
+        public async Task<ActionResult<bool>> EditarValoresNutricionalesPorId(string userId, [FromBody] ValoresNutricionalesDto valoresNutricionales)
+        {
+            try
+            {
+                var response = await _userService.EditarValoresNutricionales(userId, valoresNutricionales);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al editar valores nutricionales");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [HttpGet("paciente/{userId}")]
+        public async Task<ActionResult<User>> ObtenerPacientePorId(string userId)
+        {
+            try
+            {
+                var response = await _userService.ObtenerUsuarioPorIdAsync(userId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>

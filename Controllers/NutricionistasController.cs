@@ -39,7 +39,7 @@ namespace NutriCheck.Backend.Controllers
             if (string.IsNullOrEmpty(nutricionistaId))
                 return Unauthorized("Nutricionista no identificado");
 
-            var pacientes = await _nutricionistaService.ObtenerPacientesDelNutricionista(nutricionistaId);
+            var pacientes = await _userService.ObtenerPacientesDelNutricionista(nutricionistaId);
             return Ok(pacientes);
         }
     }

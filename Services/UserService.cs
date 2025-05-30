@@ -6,16 +6,19 @@ using NutriCheck.Backend.Models;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using NutriCheck.Models;
 
 namespace NutriCheck.Backend.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IComidaRepository _comidaRepository;
         private readonly IConfiguration _configuration;
-        public UserService(IUserRepository userRepository, IConfiguration configuration)
+        public UserService(IUserRepository userRepository, IComidaRepository comidaRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _comidaRepository = comidaRepository;
             _configuration = configuration;
         }
 
@@ -103,6 +106,8 @@ namespace NutriCheck.Backend.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public async Task<User> ObtenerUsuarioPorIdAsync(string userId) => await _userRepository.ObtenerUsuarioPorIdAsync(userId);
+
         public async Task<bool> GuardarDatosPaciente(string userId, GuardarDatosPacienteDto datosPaciente)
         {
             var datos = new NutriCheck.Models.Paciente
@@ -121,10 +126,125 @@ namespace NutriCheck.Backend.Services
         public async Task<bool> AgregarPacienteEnNutricionistaAsync(string nutricionistaId, string pacienteId)
         {
             var nutricionista = await _userRepository.ObtenerUsuarioPorIdAsync(nutricionistaId);
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
 
-            nutricionista.Nutricionista.Pacientes.Add(pacienteId);
+            if (nutricionista is null || paciente is null)
+            {
+                return false; // El nutricionista no existe
+            }
 
-            return await _userRepository.EditarUsuarioAsync(nutricionista);
+            if (nutricionista.Nutricionista == null)
+            {
+                nutricionista.Nutricionista = new Nutricionista
+                {
+                    Pacientes = new List<string>()
+                };
+            }
+
+            if (paciente.Paciente == null)
+            {
+                paciente.Paciente = new Paciente();
+            }
+
+            if (paciente.Paciente.NutricionistaId != null && paciente.Paciente.NutricionistaId != nutricionistaId)
+            {
+                return false;
+            }
+
+            if (!nutricionista.Nutricionista.Pacientes.Contains(pacienteId))
+            {
+                nutricionista.Nutricionista.Pacientes.Add(pacienteId);
+            }
+
+            paciente.Paciente.NutricionistaId = nutricionistaId;
+
+            var pacienteActualizado = await _userRepository.EditarUsuarioAsync(paciente);
+            var nutricionistaActualizado = await _userRepository.EditarUsuarioAsync(nutricionista);
+
+            return pacienteActualizado && nutricionistaActualizado;
+        }
+
+        public async Task<List<PacienteBuscadoDto>?> BuscarPacientesPorNombre(string nombre) => await _userRepository.ObtenerPacientesPorNombre(nombre);
+
+        public async Task<List<Comida>> ObtenerComidasDelPaciente(string pacienteId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
+            if (paciente == null)
+            {
+                return new List<Comida>();
+            }
+            var comidas = await _comidaRepository.ObtenerComidasPorIdsAsync(paciente.Paciente.Comidas);
+            return comidas;
+        }
+
+        public async Task<bool> AgregarComidaAPaciente(string pacienteId, string comidaId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
+            if (paciente == null)
+            {
+                return false;
+            }
+            paciente.Paciente.Comidas.Add(comidaId);
+            return await _userRepository.EditarUsuarioAsync(paciente);
+        }
+
+        // Método para obtener los valores nutricionales del paciente
+        public async Task<ValoresNutricionalesDto> ObtenerValoresNutricionalesDelPaciente(string userId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
+            if (paciente == null)
+            {
+                return null; // El paciente no existe
+            }
+            var valoresNutricionales = new ValoresNutricionalesDto
+            {
+                Calorias = paciente.Paciente.Calorias,
+                Grasas = paciente.Paciente.Grasas,
+                Carbohidratos = paciente.Paciente.Carbohidratos,
+                Proteinas = paciente.Paciente.Proteinas
+            };
+            return valoresNutricionales;
+        }
+
+        // Método para editar los valores nutricionales del paciente
+        public async Task<bool> EditarValoresNutricionales(string userId, ValoresNutricionalesDto valoresNutricionales)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
+            if (paciente == null)
+            {
+                return false; // El paciente no existe
+            }
+            paciente.Paciente.Calorias = valoresNutricionales.Calorias;
+            paciente.Paciente.Grasas = valoresNutricionales.Grasas;
+            paciente.Paciente.Carbohidratos = valoresNutricionales.Carbohidratos;
+            paciente.Paciente.Proteinas = valoresNutricionales.Proteinas;
+            return await _userRepository.EditarUsuarioAsync(paciente);
+        }
+
+        // Método para traer pacientes del nutricionista
+        public async Task<List<User>> ObtenerPacientesDelNutricionista(string nutricionistaId)
+        {
+            var nutricionista = await _userRepository.ObtenerUsuarioPorIdAsync(nutricionistaId);
+
+            // Validación básica
+            if (nutricionista?.Nutricionista?.Pacientes == null || !nutricionista.Nutricionista.Pacientes.Any())
+            {
+                return new List<User>();
+            }
+
+            // Paso 2: obtener la lista de IDs de pacientes
+            var pacientesIds = nutricionista.Nutricionista.Pacientes;
+
+            // Paso 3: buscar todos los usuarios que tengan esos IDs
+            var usuariosPacientes = await _userRepository.ObtenerUsuariosPorIdsAsync(pacientesIds);
+
+            // Paso 4: obtener solo la propiedad Paciente de cada User (y filtrar nulos por seguridad)
+            var pacientes = usuariosPacientes
+                .Where(u => u.Paciente != null)
+                .Select(u => u)
+                .ToList();
+
+            return pacientes;
         }
     }
 }

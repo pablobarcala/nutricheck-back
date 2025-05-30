@@ -25,7 +25,19 @@ namespace NutriCheck.Models
         [BsonElement("objetivo")]
         public string? Objetivo { get; set; }
 
+        [BsonElement("grasas")]
+        public double Grasas { get; set; } = 0;
+
+        [BsonElement("carbohidratos")]
+        public double Carbohidratos { get; set; } = 0;
+
+        [BsonElement("proteinas")]
+        public double Proteinas { get; set; } = 0;
+
         [BsonElement("nutricionistaId")]
         public string? NutricionistaId { get; set; }
+
+        [BsonElement("comidas")]
+        public List<string> Comidas { get; set; } = new List<string>();
     }
 }

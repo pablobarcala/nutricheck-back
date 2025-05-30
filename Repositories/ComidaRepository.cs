@@ -42,5 +42,22 @@ namespace NutriCheck.Backend.Repositories
                 return new List<Comida>();
             }
         }
+
+        // Método para obtener un listado de comidas por ids
+        public async Task<List<Comida>> ObtenerComidasPorIdsAsync(List<string> ids)
+        {
+            try
+            {
+                var filter = Builders<Comida>.Filter.In(c => c.Id, ids);
+                var comidas = await _comidas.Find(filter).ToListAsync();
+                return comidas;
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores
+                Console.WriteLine($"Error al obtener las comidas por IDs: {ex.Message}");
+                return new List<Comida>();
+            }
+        }
     }
 }
