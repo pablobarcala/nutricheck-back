@@ -197,6 +197,40 @@ namespace NutriCheck.Controllers
             }
         }
 
+        [Authorize(Roles = "paciente")]
+        [HttpPost("registrar-comida")]
+        public async Task<IActionResult> RegistrarComida([FromBody] ComidaRegistrada comida)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                var response = await _userService.RegistrarComidaEnPaciente(userId, comida);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "paciente")]
+        [HttpGet("comidas-registradas")]
+        public async Task<ActionResult<List<ComidaRegistrada>>> ObtenerComidasRegistradas()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                var response = await _userService.ObtenerComidasRegistradasDePaciente(userId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         /// <summary>
         /// Crea un nuevo paciente y lo asocia a un nutricionista.
         /// </summary>

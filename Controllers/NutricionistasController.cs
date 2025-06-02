@@ -13,12 +13,10 @@ namespace NutriCheck.Backend.Controllers
     public class NutricionistasController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly NutricionistaService _nutricionistaService;
 
-        public NutricionistasController(IUserService userService, NutricionistaService nutricionistaService)
+        public NutricionistasController(IUserService userService)
         {
             _userService = userService;
-            _nutricionistaService = nutricionistaService;
         }
 
         [Authorize]
@@ -30,7 +28,7 @@ namespace NutriCheck.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Nutricionista")]
+        [Authorize(Roles = "nutricionista")]
         [HttpGet("mis-pacientes")]
         public async Task<IActionResult> ObtenerMisPacientes()
         {

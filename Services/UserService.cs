@@ -246,5 +246,24 @@ namespace NutriCheck.Backend.Services
 
             return pacientes;
         }
+
+        public async Task<bool> RegistrarComidaEnPaciente(string userId, ComidaRegistrada comida)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
+            if (paciente == null)
+            {
+                return false;
+            }
+
+            paciente.Paciente.ComidasRegistradas.Add(comida);
+            return await _userRepository.EditarUsuarioAsync(paciente);
+        }
+
+        public async Task<List<ComidaRegistrada>> ObtenerComidasRegistradasDePaciente(string userId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
+            
+            return paciente.Paciente.ComidasRegistradas;
+        }
     }
 }

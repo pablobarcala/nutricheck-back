@@ -17,5 +17,7 @@ namespace NutriCheck.Backend.Services
         Task<ValoresNutricionalesDto> ObtenerValoresNutricionalesDelPaciente(string userId);
         Task<bool> EditarValoresNutricionales(string userId, ValoresNutricionalesDto valoresNutricionales);
         Task<List<User>> ObtenerPacientesDelNutricionista(string nutricionistaId);
+        Task<bool> RegistrarComidaEnPaciente(string userId, ComidaRegistrada comida);
+        Task<List<ComidaRegistrada>> ObtenerComidasRegistradasDePaciente(string userId);
     }
 }

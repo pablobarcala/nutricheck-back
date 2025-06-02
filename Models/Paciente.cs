@@ -39,5 +39,23 @@ namespace NutriCheck.Models
 
         [BsonElement("comidas")]
         public List<string> Comidas { get; set; } = new List<string>();
+
+        [BsonElement("comidasRegistradas")]
+        public List<ComidaRegistrada> ComidasRegistradas { get; set; } = new List<ComidaRegistrada>();
+    }
+
+    public class ComidaRegistrada
+    {
+        [BsonElement("comidaId")]
+        public string? ComidaId { get; set; }
+
+        [BsonElement("nombre")]
+        public string? Nombre { get; set; }
+
+        [BsonElement("horario")]
+        public string? Horario { get; set; }
+
+        [BsonElement("fecha")]
+        public string? Fecha { get; set; }
     }
 }
