@@ -32,13 +32,26 @@ namespace NutriCheck.Backend.Controllers
         [HttpGet("mis-pacientes")]
         public async Task<IActionResult> ObtenerMisPacientes()
         {
-            var nutricionistaId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var nutricionistaId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(nutricionistaId))
                 return Unauthorized("Nutricionista no identificado");
 
             var pacientes = await _userService.ObtenerPacientesDelNutricionista(nutricionistaId);
             return Ok(pacientes);
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpGet("comidas-mis-pacientes")]
+        public async Task<IActionResult> ObtenerComidasRegistradasDePacientes()
+        {
+            var nutricionistaId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(nutricionistaId))
+                return Unauthorized("Nutricionista no identificado");
+
+            var comidasConPaciente = await _userService.ObtenerComidasRegistradasConInfoPaciente(nutricionistaId);
+            return Ok(comidasConPaciente);
         }
     }
 }

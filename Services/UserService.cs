@@ -247,6 +247,53 @@ namespace NutriCheck.Backend.Services
             return pacientes;
         }
 
+        public async Task<List<ComidaRegistrada>> ObtenerComidasRegistradasDePaciente(string userId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
+            
+            return paciente.Paciente.ComidasRegistradas;
+        }
+
+        public async Task<List<ComidaRegistradaConPacienteDto>> ObtenerComidasRegistradasConInfoPaciente(string nutricionistaId)
+        {
+            var pacientes = await ObtenerPacientesDelNutricionista(nutricionistaId);
+
+            if (pacientes == null || !pacientes.Any())
+            {
+                return new List<ComidaRegistradaConPacienteDto>();
+            }
+
+            var comidasConPaciente = new List<ComidaRegistradaConPacienteDto>();
+
+            foreach (var paciente in pacientes)
+            {
+                var pacienteDto = new ComidaRegistradaConPacienteDto
+                {
+                    Nombre = paciente.Nombre ?? string.Empty // o como tengas el nombre en tu modelo
+                };
+
+                if (paciente.Paciente?.ComidasRegistradas != null && paciente.Paciente.ComidasRegistradas.Any())
+                {
+                    foreach (var comida in paciente.Paciente.ComidasRegistradas)
+                    {
+                        if (comida != null)
+                        {
+                            pacienteDto.Comidas.Add(new ComidaParaFront
+                            {
+                                Title = comida.Nombre ?? string.Empty,
+                                Horario = comida.Horario ?? string.Empty,
+                                Fecha = comida.Fecha ?? string.Empty
+                            });
+                        }
+                    }
+                }
+
+                comidasConPaciente.Add(pacienteDto);
+            }
+
+            return comidasConPaciente;
+        }
+
         public async Task<bool> RegistrarComidaEnPaciente(string userId, ComidaRegistrada comida)
         {
             var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
@@ -257,13 +304,6 @@ namespace NutriCheck.Backend.Services
 
             paciente.Paciente.ComidasRegistradas.Add(comida);
             return await _userRepository.EditarUsuarioAsync(paciente);
-        }
-
-        public async Task<List<ComidaRegistrada>> ObtenerComidasRegistradasDePaciente(string userId)
-        {
-            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
-            
-            return paciente.Paciente.ComidasRegistradas;
         }
     }
 }
