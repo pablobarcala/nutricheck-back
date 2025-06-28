@@ -3,32 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\dtos\\comidaregistradaconpacientedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:dtos\\comidaregistradaconpacientedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\models\\paciente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:models\\paciente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\dtos\\estadisticasglobalesdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:dtos\\estadisticasglobalesdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\controllers\\nutricionistascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:controllers\\nutricionistascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\models\\comida.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:models\\comida.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\services\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:services\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|c:\\users\\pablo\\onedrive\\escritorio\\nutricheck\\back\\nutricheck-back\\repositories\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E0AFECE2-91E0-18E6-AA32-FBD0226A30B9}|NutriCheck.Backend.csproj|solutionrelative:repositories\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,45 +30,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ComidaRegistradaConPacienteDto.cs",
-              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Dtos\\ComidaRegistradaConPacienteDto.cs",
-              "RelativeDocumentMoniker": "Dtos\\ComidaRegistradaConPacienteDto.cs",
-              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Dtos\\ComidaRegistradaConPacienteDto.cs",
-              "RelativeToolTip": "Dtos\\ComidaRegistradaConPacienteDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-17T22:06:32.828Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "NutricionistasController.cs",
               "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Controllers\\NutricionistasController.cs",
               "RelativeDocumentMoniker": "Controllers\\NutricionistasController.cs",
               "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Controllers\\NutricionistasController.cs",
               "RelativeToolTip": "Controllers\\NutricionistasController.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAuwCIAAABQAAAAAAAAAA==",
+              "ViewState": "AgIAACoAAAAAAAAAAAAwwEQAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-02T12:44:35.827Z",
+              "WhenOpened": "2025-06-27T23:49:27.449Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "UserService.cs",
-              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Services\\UserService.cs",
-              "RelativeDocumentMoniker": "Services\\UserService.cs",
-              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Services\\UserService.cs",
-              "RelativeToolTip": "Services\\UserService.cs",
-              "ViewState": "AgIAAAYBAAAAAAAAAAAowBgBAAAcAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "Comida.cs",
+              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Models\\Comida.cs",
+              "RelativeDocumentMoniker": "Models\\Comida.cs",
+              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Models\\Comida.cs",
+              "RelativeToolTip": "Models\\Comida.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-30T18:52:50.861Z",
+              "WhenOpened": "2025-06-27T23:44:38.562Z",
               "EditorCaption": ""
             },
             {
@@ -87,46 +66,35 @@
               "RelativeDocumentMoniker": "Services\\IUserService.cs",
               "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Services\\IUserService.cs",
               "RelativeToolTip": "Services\\IUserService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAzAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAA5wBYAAABiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-30T18:51:56.744Z",
+              "WhenOpened": "2025-06-27T23:22:18.616Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "UserRepository.cs",
-              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Repositories\\UserRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\UserRepository.cs",
-              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Repositories\\UserRepository.cs",
-              "RelativeToolTip": "Repositories\\UserRepository.cs",
-              "ViewState": "AgIAAEMAAAAAAAAAAAAQwF8AAABCAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "Services\\UserService.cs",
+              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Services\\UserService.cs",
+              "RelativeToolTip": "Services\\UserService.cs",
+              "ViewState": "AgIAAEoBAAAAAAAAAAAswEoBAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-30T18:51:14.771Z"
+              "WhenOpened": "2025-06-27T23:22:04.679Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "IUserRepository.cs",
-              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Repositories\\IUserRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\IUserRepository.cs",
-              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Repositories\\IUserRepository.cs",
-              "RelativeToolTip": "Repositories\\IUserRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAxAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "EstadisticasGlobalesDto.cs",
+              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Dtos\\EstadisticasGlobalesDto.cs",
+              "RelativeDocumentMoniker": "Dtos\\EstadisticasGlobalesDto.cs",
+              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Dtos\\EstadisticasGlobalesDto.cs",
+              "RelativeToolTip": "Dtos\\EstadisticasGlobalesDto.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAkAAABGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-30T18:50:04.836Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Paciente.cs",
-              "DocumentMoniker": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Models\\Paciente.cs",
-              "RelativeDocumentMoniker": "Models\\Paciente.cs",
-              "ToolTip": "C:\\Users\\pablo\\OneDrive\\Escritorio\\NutriCheck\\back\\nutricheck-back\\Models\\Paciente.cs",
-              "RelativeToolTip": "Models\\Paciente.cs",
-              "ViewState": "AgIAACgAAAAAAAAAAAAMwDoAAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-30T18:48:49.013Z",
+              "WhenOpened": "2025-06-27T23:18:08.992Z",
               "EditorCaption": ""
             }
           ]

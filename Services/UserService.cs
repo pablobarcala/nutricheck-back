@@ -128,8 +128,12 @@ namespace NutriCheck.Backend.Services
             var nutricionista = await _userRepository.ObtenerUsuarioPorIdAsync(nutricionistaId);
             var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
 
+            Console.WriteLine(nutricionista.Nombre);
+            Console.WriteLine(paciente.Nombre);
+
             if (nutricionista is null || paciente is null)
             {
+                Console.WriteLine("El nutricionista o paciente no existe");
                 return false; // El nutricionista no existe
             }
 
@@ -148,6 +152,7 @@ namespace NutriCheck.Backend.Services
 
             if (paciente.Paciente.NutricionistaId != null && paciente.Paciente.NutricionistaId != nutricionistaId)
             {
+                Console.WriteLine("El paciente ya está vinculado a otro nutricionista");
                 return false;
             }
 
@@ -160,6 +165,9 @@ namespace NutriCheck.Backend.Services
 
             var pacienteActualizado = await _userRepository.EditarUsuarioAsync(paciente);
             var nutricionistaActualizado = await _userRepository.EditarUsuarioAsync(nutricionista);
+
+            Console.WriteLine("Paciente actualizado: ", pacienteActualizado);
+            Console.WriteLine("Nutricionista actualizado: ", nutricionistaActualizado);
 
             return pacienteActualizado && nutricionistaActualizado;
         }
@@ -304,6 +312,229 @@ namespace NutriCheck.Backend.Services
 
             paciente.Paciente.ComidasRegistradas.Add(comida);
             return await _userRepository.EditarUsuarioAsync(paciente);
+        }
+
+        public async Task<EstadisticasGlobalesDto> CalcularEstadisticasDeNutricionista(string nutricionistaId)
+        {
+            var pacientes = await ObtenerPacientesDelNutricionista(nutricionistaId);
+
+            var promedioGlobal = await CalcularPromedioCumplimientoCalorico(pacientes);
+            var cumplimientoPorDia = await CalcularCumplimientoDiario(pacientes);
+            var pacientesBajo = await CalcularPacientesConBajoCumplimiento(pacientes);
+            var comidasPopulares = CalcularComidasMasRegistradas(pacientes);
+
+            var estadisticas = new EstadisticasGlobalesDto
+            {
+                PromedioCumplimientoCalorico = promedioGlobal,
+                PacientesConBajoCumplimiento = pacientesBajo,
+                CumplimientoCaloricoPorDia = cumplimientoPorDia,
+                ComidasMasPopulares = comidasPopulares
+            };
+
+            return estadisticas;
+        }
+
+        // METODOS DE ESTADISTICAS
+        private async Task<double> CalcularPromedioCumplimientoCalorico(List<User> pacientes)
+        {
+            var fechaLimite = DateTime.UtcNow.Date.AddDays(-6);
+
+            double promedioTotal = 0.0;
+            int pacientesContados = 0;
+
+            foreach (var paciente in pacientes)
+            {
+                var caloriasRecomendadas = paciente.Paciente.Calorias;
+                if (caloriasRecomendadas == 0 || paciente.Paciente.ComidasRegistradas == null)
+                    continue;
+
+                // Obtener comidas registradas de los últimos 7 días
+                var comidasUltimaSemana = paciente.Paciente.ComidasRegistradas
+                    .Where(c =>
+                        !string.IsNullOrEmpty(c.Fecha) &&
+                        DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                        fechaParseada.Date >= fechaLimite)
+                    .ToList();
+
+                //Console.WriteLine(comidasUltimaSemana);
+
+                if (!comidasUltimaSemana.Any()) continue;
+
+                // Obtener los IDs únicos de comidas
+                var comidaIds = comidasUltimaSemana
+                    .Select(c => c.ComidaId)
+                    .Where(id => !string.IsNullOrEmpty(id))
+                    .Distinct()
+                    .ToList();
+
+                //Console.WriteLine(comidaIds);
+
+                if (!comidaIds.Any()) continue;
+
+                // Obtener las comidas con sus calorías desde la colección central
+                var comidasConCalorias = await _comidaRepository.ObtenerComidasPorIdsAsync(comidaIds);
+                var dictCalorias = comidasConCalorias.ToDictionary(c => c.Id, c => c.Kcal);
+
+                // Agrupar las comidas por día y sumar las calorías
+                var caloriasPorDia = comidasUltimaSemana
+                    .GroupBy(c => DateTime.Parse(c.Fecha).Date)
+                    .Select(g => new
+                    {
+                        Fecha = g.Key,
+                        TotalCalorias = g.Sum(c => dictCalorias.GetValueOrDefault(c.ComidaId, 0))
+                    })
+                    .ToList();
+
+                if (!caloriasPorDia.Any()) continue;
+
+                // Calcular promedio de cumplimiento por día
+                var promedioCumplimiento = caloriasPorDia
+                    .Average(dia => (double)dia.TotalCalorias / caloriasRecomendadas * 100);
+
+                promedioTotal += promedioCumplimiento;
+                pacientesContados++;
+            }
+
+            return pacientesContados == 0 ? 0 : promedioTotal / pacientesContados;
+        }
+
+        private async Task<List<CumplimientoDiarioDto>> CalcularCumplimientoDiario(List<User> pacientes)
+        {
+            var dias = Enumerable.Range(0, 7)
+                .Select(offset => DateTime.UtcNow.Date.AddDays(-offset))
+                .OrderBy(d => d)
+                .ToList();
+
+            var resultado = new List<CumplimientoDiarioDto>();
+
+            foreach (var dia in dias)
+            {
+                double sumaCumplimiento = 0;
+                int pacientesContados = 0;
+
+                foreach (var paciente in pacientes)
+                {
+                    var caloriasRecomendadas = paciente.Paciente?.Calorias ?? 0;
+                    if (caloriasRecomendadas == 0 || paciente.Paciente.ComidasRegistradas == null)
+                        continue;
+
+                    var comidasDelDia = paciente.Paciente.ComidasRegistradas
+                        .Where(c =>
+                            !string.IsNullOrEmpty(c.Fecha) &&
+                            DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                            fechaParseada.Date == dia)
+                        .ToList();
+
+                    if (!comidasDelDia.Any()) continue;
+
+                    var comidaIds = comidasDelDia
+                        .Select(c => c.ComidaId)
+                        .Where(id => !string.IsNullOrEmpty(id))
+                        .Distinct()
+                        .ToList();
+
+                    if (!comidaIds.Any()) continue;
+
+                    var comidasConCalorias = await _comidaRepository.ObtenerComidasPorIdsAsync(comidaIds);
+                    var dictCalorias = comidasConCalorias.ToDictionary(c => c.Id, c => c.Kcal);
+
+                    int kcalConsumidas = comidasDelDia.Sum(c => dictCalorias.GetValueOrDefault(c.ComidaId, 0));
+                    double cumplimiento = (double)kcalConsumidas / caloriasRecomendadas * 100;
+
+                    sumaCumplimiento += cumplimiento;
+                    pacientesContados++;
+                }
+
+                double promedioDia = pacientesContados > 0 ? sumaCumplimiento / pacientesContados : 0;
+
+                resultado.Add(new CumplimientoDiarioDto
+                {
+                    Fecha = dia,
+                    PorcentajeCumplido = promedioDia
+                });
+            }
+
+            return resultado;
+        }
+
+        private async Task<int> CalcularPacientesConBajoCumplimiento(List<User> pacientes)
+        {
+            var dias = Enumerable.Range(0, 7)
+                .Select(offset => DateTime.UtcNow.Date.AddDays(-offset))
+                .ToList();
+
+            int pacientesConBajoCumplimiento = 0;
+
+            foreach (var paciente in pacientes)
+            {
+                var caloriasRecomendadas = paciente.Paciente?.Calorias ?? 0;
+                if (caloriasRecomendadas == 0 || paciente.Paciente.ComidasRegistradas == null)
+                    continue;
+
+                int diasBajo = 0;
+
+                foreach (var dia in dias)
+                {
+                    var comidasDelDia = paciente.Paciente.ComidasRegistradas
+                        .Where(c =>
+                            !string.IsNullOrEmpty(c.Fecha) &&
+                            DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                            fechaParseada.Date == dia)
+                        .ToList();
+
+                    if (!comidasDelDia.Any()) continue;
+
+                    var comidaIds = comidasDelDia
+                        .Select(c => c.ComidaId)
+                        .Where(id => !string.IsNullOrEmpty(id))
+                        .Distinct()
+                        .ToList();
+
+                    if (!comidaIds.Any()) continue;
+
+                    var comidasConCalorias = await _comidaRepository.ObtenerComidasPorIdsAsync(comidaIds);
+                    var dictCalorias = comidasConCalorias.ToDictionary(c => c.Id, c => c.Kcal);
+
+                    int kcalConsumidas = comidasDelDia.Sum(c => dictCalorias.GetValueOrDefault(c.ComidaId, 0));
+                    double cumplimiento = (double)kcalConsumidas / caloriasRecomendadas * 100;
+
+                    if (cumplimiento < 80)
+                        diasBajo++;
+                }
+
+                if (diasBajo >= 3)
+                    pacientesConBajoCumplimiento++;
+            }
+
+            return pacientesConBajoCumplimiento;
+        }
+
+        private List<ComidaPopularDto> CalcularComidasMasRegistradas(List<User> pacientes)
+        {
+            var fechaLimite = DateTime.UtcNow.Date.AddDays(-6);
+
+            var comidas = pacientes
+                .Where(p => p.Paciente?.ComidasRegistradas != null)
+                .SelectMany(p => p.Paciente.ComidasRegistradas)
+                .Where(c =>
+                    !string.IsNullOrEmpty(c.Fecha) &&
+                    DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                    fechaParseada.Date >= fechaLimite &&
+                    !string.IsNullOrEmpty(c.Nombre))
+                .ToList();
+
+            var topComidas = comidas
+                .GroupBy(c => c.Nombre!.Trim().ToLower())
+                .Select(g => new ComidaPopularDto
+                {
+                    Nombre = g.First().Nombre,
+                    Cantidad = g.Count()
+                })
+                .OrderByDescending(c => c.Cantidad)
+                .Take(5)
+                .ToList();
+
+            return topComidas;
         }
     }
 }
