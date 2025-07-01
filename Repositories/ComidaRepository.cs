@@ -59,5 +59,39 @@ namespace NutriCheck.Backend.Repositories
                 return new List<Comida>();
             }
         }
+
+        // Método para eliminar una comdia
+        public async Task<bool> EliminarComidaAsync(string comidaId, string nutricionistaId)
+        {
+            try
+            {
+                var resultado = await _comidas.DeleteOneAsync(c => c.Id == comidaId && c.NutricionistaId == nutricionistaId);
+                return resultado.DeletedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar la comida: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Método para editar una comida
+        public async Task<bool> EditarComidaAsync(Comida nuevaComida, string nutricionistaId)
+        {
+            try
+            {
+                var resultado = await _comidas.ReplaceOneAsync(
+                    c => c.Id == nuevaComida.Id && c.NutricionistaId == nutricionistaId,
+                    nuevaComida
+                );
+
+                return resultado.ModifiedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al editar la comida: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

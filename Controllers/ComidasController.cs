@@ -69,6 +69,50 @@ namespace NutriCheck.Controllers
             }
         }
 
+        [Authorize(Roles = "nutricionista")]
+        [HttpDelete("eliminar/{comidaId}")]
+        public async Task<ActionResult<bool>> EliminarComida(string comidaId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+
+            try
+            {
+                var response = await _comidaService.EliminarComidaAsync(comidaId, userId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPut("editar")]
+        public async Task<ActionResult<bool>> EditarComida([FromBody] Comida nuevaComida)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty (userId))
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+
+            try
+            {
+                var response = await _comidaService.EditarComidaAsync(nuevaComida, userId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Registra una comida consumida por un paciente en un momento del día.
         /// </summary>

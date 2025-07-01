@@ -7,8 +7,11 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+if (builder.Environment.IsProduction())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
 // Configurar licencia de QuestPDF
 QuestPDF.Settings.License = LicenseType.Community; // 👈 Esta línea es la clave
 
@@ -60,25 +63,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
-// Precarga de nutricionista de prueba
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-//    // Agregar nutricionista solo si no existe
-//    if (!db.Nutricionistas.Any())
-//    {
-//        db.Nutricionistas.Add(new Nutricionista
-//        {
-//            Nombre = "Martin Sanchez",
-//            Email = "martin@nutricheck.com",
-//            Password = "1234" // Por ahora sin encriptar
-//        });
-
-//        db.SaveChanges();
-//    }
-//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

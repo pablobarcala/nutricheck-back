@@ -39,5 +39,10 @@ namespace NutriCheck.Backend.Services
                 return new List<Comida>();
             }
         }
+
+        // Método para eliminar una comida
+        public async Task<bool> EliminarComidaAsync(string comidaId, string nutricionistaId) => await _comidaRepository.EliminarComidaAsync(comidaId, nutricionistaId);
+        // Método para editar una comida
+        public async Task<bool> EditarComidaAsync(Comida nuevaComida, string nutricionistaId) => await _comidaRepository.EditarComidaAsync(nuevaComida, nutricionistaId);
     }
 }
