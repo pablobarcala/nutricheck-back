@@ -322,13 +322,21 @@ namespace NutriCheck.Backend.Services
             var cumplimientoPorDia = await CalcularCumplimientoDiario(pacientes);
             var pacientesBajo = await CalcularPacientesConBajoCumplimiento(pacientes);
             var comidasPopulares = CalcularComidasMasRegistradas(pacientes);
+            var nivelesActividad = CalcularPacientesPorNivelActividad(pacientes);
+
+            var ranking = CalcularRankingDePacientes(pacientes);
+            var pacientesConstantes = ranking.OrderByDescending(r => r.DiasConRegistro).Take(5).ToList();
+            var pacientesFaltantes = ranking.OrderBy(r => r.DiasConRegistro).Take(5).ToList();
 
             var estadisticas = new EstadisticasGlobalesDto
             {
                 PromedioCumplimientoCalorico = promedioGlobal,
                 PacientesConBajoCumplimiento = pacientesBajo,
                 CumplimientoCaloricoPorDia = cumplimientoPorDia,
-                ComidasMasPopulares = comidasPopulares
+                ComidasMasPopulares = comidasPopulares,
+                PacientesPorNivelActividad = nivelesActividad,
+                PacientesMasConstantes = pacientesConstantes,
+                PacientesConMasFaltantes = pacientesFaltantes
             };
 
             return estadisticas;
@@ -535,6 +543,50 @@ namespace NutriCheck.Backend.Services
                 .ToList();
 
             return topComidas;
+        }
+
+        private List<NivelActividadDto> CalcularPacientesPorNivelActividad(List<User> pacientes)
+        {
+            return pacientes
+                .Where(p => p.Paciente != null && !string.IsNullOrEmpty(p.Paciente.Actividad))
+                .GroupBy(p => p.Paciente.Actividad!.Trim().ToLower())
+                .Select(g => new NivelActividadDto
+                {
+                    Nivel = g.Key,
+                    Cantidad = g.Count()
+                })
+                .ToList();
+        }
+
+        private List<RankingPacienteDto> CalcularRankingDePacientes(List<User> pacientes)
+        {
+            var dias = Enumerable.Range(0, 7)
+                .Select(offset => DateTime.UtcNow.Date.AddDays(-offset))
+                .ToList();
+
+            var ranking = new List<RankingPacienteDto>();
+
+            foreach (var paciente in pacientes)
+            {
+                if (paciente.Paciente?.ComidasRegistradas == null) continue;
+
+                var diasConRegistro = dias.Count(dia =>
+                    paciente.Paciente.ComidasRegistradas.Any(c =>
+                        !string.IsNullOrEmpty(c.Fecha) &&
+                        DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                        fechaParseada.Date == dia
+                    )
+                );
+
+                ranking.Add(new RankingPacienteDto
+                {
+                    PacienteId = paciente.Id,
+                    Nombre = paciente.Nombre ?? "Sin nombre",
+                    DiasConRegistro = diasConRegistro
+                });
+            }
+
+            return ranking;
         }
     }
 }
