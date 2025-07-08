@@ -1,5 +1,5 @@
 using NutriCheck.Backend;
-using NutriCheck.Backend.Repositories; // 👈 Asegúrate de tener este using
+using NutriCheck.Backend.Repositories;
 using NutriCheck.Backend.Services;
 using QuestPDF.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,25 +7,28 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configurar URL del servidor
 if (builder.Environment.IsProduction())
 {
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+    var port = Environment.GetEnvironmentVariable("PORT")??"8080";
+    var url = $"http://0.0.0.0:{port}".Trim(); // 👈 evita espacios
+    Console.WriteLine($"🚀 Iniciando en: {url}"); // 👈 debug
+    builder.WebHost.UseUrls(url);
 }
-// Configurar licencia de QuestPDF
-QuestPDF.Settings.License = LicenseType.Community; // 👈 Esta línea es la clave
 
-// Add services to the container.
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseInMemoryDatabase("NutriCheckDb")); // Base temporal para pruebas
+// Configurar licencia de QuestPDF
+QuestPDF.Settings.License = LicenseType.Community;
+
+// Servicios
 builder.Services.AddControllers();
 builder.Services.AddSingleton<MongoDBConnection>();
 builder.Services.AddEndpointsApiExplorer();
 
 string? value = builder.Configuration.GetSection("Token").Value;
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(value)),
@@ -36,11 +39,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-
 builder.Services.AddScoped<IComidaRepository, ComidaRepository>();
 builder.Services.AddScoped<IComidaService, ComidaService>();
 
-// 👇 Configuración para leer los comentarios XML
+// Swagger XML docs
 builder.Services.AddSwaggerGen(options =>
 {
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -48,7 +50,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 
-// Configuración de CORS
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PermitirVarios", policy =>
@@ -64,7 +66,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -73,8 +75,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("PermitirVarios");
+app.UseAuthentication(); // 👈 Importante si usás JWT
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

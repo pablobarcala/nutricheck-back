@@ -67,6 +67,13 @@ namespace NutriCheck.Controllers
                 return StatusCode(500, "Ocurrió un error inesperado");
             }
         }
+        [Authorize(Roles = "paciente")]
+        [HttpPost("prueba-autorizacion")]
+        public IActionResult ProbarAutenticacionPaciente()
+        {
+        return Ok("Paciente autenticado correctamente.");
+        }
+
 
         [Authorize(Roles = "paciente")]
         [HttpGet("comidas")]
