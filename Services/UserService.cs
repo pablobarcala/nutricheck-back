@@ -314,6 +314,7 @@ namespace NutriCheck.Backend.Services
             return await _userRepository.EditarUsuarioAsync(paciente);
         }
 
+        // METODO PARA DEVOLVER ESTADISTICAS DE UN NUTRICIONISTA
         public async Task<EstadisticasGlobalesDto> CalcularEstadisticasDeNutricionista(string nutricionistaId)
         {
             var pacientes = await ObtenerPacientesDelNutricionista(nutricionistaId);
@@ -583,6 +584,149 @@ namespace NutriCheck.Backend.Services
                     PacienteId = paciente.Id,
                     Nombre = paciente.Nombre ?? "Sin nombre",
                     DiasConRegistro = diasConRegistro
+                });
+            }
+
+            return ranking;
+        }
+    
+        // METODO PARA DEVOLVER ESTADISTICAS DE UN PACIENTE
+        public async Task<EstadisticasPacienteDto> CalcularEstadisticasDePaciente(string pacienteId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
+
+            var comidasMasRegistradas = CalcularComidasMasRegistradasPorPaciente(paciente);
+            var cumplimientoCaloricoDiario = await CalcularCumplimientoCaloricoDiarioDePaciente(paciente);
+            var rankingDias = CalcularRankingDeDiasConMasComidas(paciente);
+
+            var estadisticas = new EstadisticasPacienteDto
+            {
+                ComidasMasPopulares = comidasMasRegistradas,
+                CumplimientoCaloricoDiario = cumplimientoCaloricoDiario,
+                DiasConMasComidas = rankingDias
+            };
+
+            return estadisticas;
+        }
+
+        // METODOS PARA ESTADISTICAS DE PACIENTE
+        private List<ComidaPopularDto> CalcularComidasMasRegistradasPorPaciente(User paciente)
+        {
+            var fechaLimite = DateTime.UtcNow.Date.AddDays(-6);
+
+            var comidas = paciente.Paciente?.ComidasRegistradas?
+                .Where(c => 
+                    !string.IsNullOrEmpty(c.Fecha) &&
+                    DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                    fechaParseada.Date >= fechaLimite &&
+                    !string.IsNullOrEmpty(c.Nombre))
+                .ToList() ?? new List<ComidaRegistrada>();
+
+            var topComidas = comidas
+                .GroupBy(c => c.Nombre!.Trim().ToLower())
+                .Select(g => new ComidaPopularDto
+                {
+                    Nombre = g.First().Nombre,
+                    Cantidad = g.Count()
+                })
+                .OrderByDescending(c => c.Cantidad)
+                .Take(5)
+                .ToList();
+
+            return topComidas;
+        }
+
+        private async Task<List<CumplimientoDiarioDto>> CalcularCumplimientoCaloricoDiarioDePaciente(User paciente)
+        {
+            var dias = Enumerable.Range(0, 7)
+                .Select(offset => DateTime.UtcNow.Date.AddDays(-offset))
+                .OrderBy(d => d)
+                .ToList();
+
+            var resultado = new List<CumplimientoDiarioDto>();
+
+            foreach (var dia in dias)
+            {
+                double cumplimientoDia = 0;
+
+                var caloriasRecomendadas = paciente.Paciente?.Calorias ?? 0;
+                if (caloriasRecomendadas != 0 && paciente.Paciente?.ComidasRegistradas != null)
+                {
+                    var comidasDelDia = paciente.Paciente.ComidasRegistradas
+                        .Where(c =>
+                            !string.IsNullOrEmpty(c.Fecha) &&
+                            DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                            fechaParseada.Date == dia)
+                        .ToList();
+
+                    if (comidasDelDia.Any())
+                    {
+                        var comidaIds = comidasDelDia
+                            .Select(c => c.ComidaId)
+                            .Where(id => !string.IsNullOrEmpty(id))
+                            .Distinct()
+                            .ToList();
+
+                        if (comidaIds.Any())
+                        {
+                            var comidasConCalorias = await _comidaRepository.ObtenerComidasPorIdsAsync(comidaIds);
+                            var dictCalorias = comidasConCalorias.ToDictionary(c => c.Id, c => c.Kcal);
+
+                            int kcalConsumidas = comidasDelDia.Sum(c => dictCalorias.GetValueOrDefault(c.ComidaId, 0));
+                            cumplimientoDia = (double)kcalConsumidas / caloriasRecomendadas * 100;
+                        }
+                    }
+                }
+
+                resultado.Add(new CumplimientoDiarioDto
+                {
+                    Fecha = dia,
+                    PorcentajeCumplido = cumplimientoDia
+                });
+            }
+
+            return resultado;
+        }
+    
+        private List<RankingDiasDto> CalcularRankingDeDiasConMasComidas(User paciente)
+        {
+            var culture = new System.Globalization.CultureInfo("es-ES");
+
+            var dias = Enumerable.Range(0, 7)
+                .Select(offset => DateTime.UtcNow.Date.AddDays(-offset))
+                .ToList();
+
+            var ranking = new List<RankingDiasDto>();
+
+            if (paciente.Paciente?.ComidasRegistradas == null)
+            {
+                return dias.Select(d => new RankingDiasDto
+                {
+                    Fecha = $"{culture.DateTimeFormat.GetDayName(d.DayOfWeek)} {d:dd-MM-yyyy}",
+                    ComidasRegistradas = 0
+                }).ToList();
+            }
+
+            var comidasPorDia = dias
+                .Select(dia => new
+                {
+                    Fecha = dia,
+                    NombreDia = culture.DateTimeFormat.GetDayName(dia.DayOfWeek),
+                    Comidas = paciente.Paciente.ComidasRegistradas
+                        .Count(c => !string.IsNullOrEmpty(c.Fecha) &&
+                                   DateTime.TryParse(c.Fecha, out var fechaParseada) &&
+                                   fechaParseada.Date == dia)
+                })
+                .OrderByDescending(x => x.Comidas)
+                .ThenBy(x => x.Fecha)
+                .ToList();
+
+            foreach (var dia in comidasPorDia)
+            {
+                ranking.Add(new RankingDiasDto
+                {
+                    Fecha = $"{dia.NombreDia} {dia.Fecha:dd-MM-yyyy}",
+                    ComidasRegistradas = dia.Comidas
                 });
             }
 

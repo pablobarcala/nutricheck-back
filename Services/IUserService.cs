@@ -21,5 +21,6 @@ namespace NutriCheck.Backend.Services
         Task<List<ComidaRegistradaConPacienteDto>> ObtenerComidasRegistradasConInfoPaciente(string nutricionistaId);
         Task<bool> RegistrarComidaEnPaciente(string userId, ComidaRegistrada comida);
         Task<EstadisticasGlobalesDto> CalcularEstadisticasDeNutricionista(string nutricionistaId);
+        Task<EstadisticasPacienteDto> CalcularEstadisticasDePaciente(string pacienteId);
     }
 }

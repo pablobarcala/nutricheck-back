@@ -5,6 +5,7 @@ namespace NutriCheck.Backend.Repositories
     public interface IComidaRepository
     {
         Task<bool> CrearComidaAsync(Comida comida);
+        Task<bool> CrearMuchasComidasAsync(List<Comida> comidas);
         Task<List<Comida>> ObtenerComidasPorNutricionistaAsync(string nutricionistaId);
         Task<List<Comida>> ObtenerComidasPorIdsAsync(List<string> ids);
         // Eliminar comida

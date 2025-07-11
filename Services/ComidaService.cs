@@ -26,6 +26,19 @@ namespace NutriCheck.Backend.Services
             }
         }
 
+        public async Task<bool> CrearMuchasComidasAsync(List<Comida> comidas)
+        {
+            try
+            {
+                return await _comidaRepository.CrearMuchasComidasAsync(comidas);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al crear muchas comidas: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<List<Comida>> ObtenerComidasPorNutricionistaAsync(string nutricionistaId)
         {
             try

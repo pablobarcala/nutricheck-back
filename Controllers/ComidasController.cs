@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using NutriCheck.Backend.Services;
 using NutriCheck.Models;
 using System.Security.Claims;
@@ -44,6 +45,36 @@ namespace NutriCheck.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPost("crear-multiples")]
+        public async Task<ActionResult<string>> CrearMuchasComidas([FromBody] List<Comida> comidas)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            comidas.ForEach(c => c.NutricionistaId = userId);
+
+            if (comidas.IsNullOrEmpty())
+            {
+                return BadRequest("La lista de comidas es nula");
+            }
+            try
+            {
+                var resultado = await _comidaService.CrearMuchasComidasAsync(comidas);
+                if (resultado)
+                {
+                    return Ok("Comidas creadas exitosamente");
+                }
+                else
+                {
+                    return StatusCode(500, "Error al crear las comidas");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno {ex.Message}");
             }
         }
 

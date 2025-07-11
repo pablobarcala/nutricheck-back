@@ -20,6 +20,28 @@ namespace NutriCheck.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "paciente")]
+        [HttpGet("mis-calorias")]
+        public async Task<ActionResult<int>> ObtenerMisCaloriasObjetivo()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest("El ID del usuario no es válido.");
+            }
+
+            try
+            {
+                var paciente = await _userService.ObtenerUsuarioPorIdAsync(userId);
+                return Ok(paciente.Paciente?.Calorias);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [Authorize]
         [HttpPost("guardar-datos")]
         public async Task<ActionResult<string>> GuardarDatosPaciente([FromBody] GuardarDatosPacienteDto datosPaciente)
@@ -167,6 +189,29 @@ namespace NutriCheck.Controllers
             try
             {
                 var response = await _userService.EditarValoresNutricionales(userId, valoresNutricionales);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al editar valores nutricionales");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpGet("estadisticas/{pacienteId}")]
+        public async Task<ActionResult<List<EstadisticasPacienteDto>>> ObtenerEstadisticasDePaciente(string pacienteId)
+        {
+            try
+            {
+                var response = await _userService.CalcularEstadisticasDePaciente(pacienteId);
                 return Ok(response);
             }
             catch (ArgumentException ex)

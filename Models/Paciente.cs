@@ -57,5 +57,8 @@ namespace NutriCheck.Models
 
         [BsonElement("fecha")]
         public string? Fecha { get; set; }
+
+        [BsonElement("kcal")]
+        public int? Kcal { get; set; }
     }
 }
