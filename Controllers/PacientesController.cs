@@ -235,6 +235,31 @@ namespace NutriCheck.Controllers
             }
         }
 
+        [Authorize(Roles = "paciente")]
+        [HttpGet("estadisticas")]
+        public async Task<ActionResult<List<EstadisticasPacienteDto>>> ObtenerEstadisticasDePacientePorToken()
+        {
+            var pacienteId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            try
+            {
+                var response = await _userService.CalcularEstadisticasDePaciente(pacienteId);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, "Error interno al editar valores nutricionales");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error inesperado");
+            }
+        }
+
         [HttpGet("paciente/{userId}")]
         public async Task<ActionResult<User>> ObtenerPacientePorId(string userId)
         {
