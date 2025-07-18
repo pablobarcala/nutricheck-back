@@ -93,7 +93,7 @@ namespace NutriCheck.Controllers
         [HttpPost("prueba-autorizacion")]
         public IActionResult ProbarAutenticacionPaciente()
         {
-        return Ok("Paciente autenticado correctamente.");
+            return Ok("Paciente autenticado correctamente.");
         }
 
 
@@ -275,6 +275,52 @@ namespace NutriCheck.Controllers
             try
             {
                 var response = await _userService.ObtenerComidasRegistradasDePaciente(userId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "nutricionista")]
+        [HttpPost("edit-plan-semanal/{pacienteId}")]
+        public async Task<IActionResult> CargarPlanSemanal(string pacienteId, [FromBody] PlanSemanal plan)
+        {
+            try
+            {
+                var response = await _userService.AgregarPlanSemanalAsync(pacienteId, plan);
+                return Ok("Plan cargado correctamente");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "paciente")]
+        [HttpGet("plan-semanal")]
+        public async Task<ActionResult<List<PlanSemanalDto>>> TomarPlanSemanal()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                var response = await _userService.TomarPlanSemanalPorIdAsync(userId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("plan-semanal/{pacienteId}")]
+        public async Task<ActionResult<List<PlanSemanalDto>>> TomarPlanSemanalPorId(string pacienteId)
+        {
+            try
+            {
+                var response = await _userService.TomarPlanSemanalPorIdAsync(pacienteId);
                 return Ok(response);
             }
             catch (Exception ex)

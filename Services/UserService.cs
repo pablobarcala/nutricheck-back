@@ -258,7 +258,7 @@ namespace NutriCheck.Backend.Services
         public async Task<List<ComidaRegistrada>> ObtenerComidasRegistradasDePaciente(string userId)
         {
             var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(userId);
-            
+
             return paciente.Paciente.ComidasRegistradas;
         }
 
@@ -589,7 +589,7 @@ namespace NutriCheck.Backend.Services
 
             return ranking;
         }
-    
+
         // METODO PARA DEVOLVER ESTADISTICAS DE UN PACIENTE
         public async Task<EstadisticasPacienteDto> CalcularEstadisticasDePaciente(string pacienteId)
         {
@@ -615,7 +615,7 @@ namespace NutriCheck.Backend.Services
             var fechaLimite = DateTime.UtcNow.Date.AddDays(-6);
 
             var comidas = paciente.Paciente?.ComidasRegistradas?
-                .Where(c => 
+                .Where(c =>
                     !string.IsNullOrEmpty(c.Fecha) &&
                     DateTime.TryParse(c.Fecha, out var fechaParseada) &&
                     fechaParseada.Date >= fechaLimite &&
@@ -687,7 +687,7 @@ namespace NutriCheck.Backend.Services
 
             return resultado;
         }
-    
+
         private List<RankingDiasDto> CalcularRankingDeDiasConMasComidas(User paciente)
         {
             var culture = new System.Globalization.CultureInfo("es-ES");
@@ -731,6 +731,64 @@ namespace NutriCheck.Backend.Services
             }
 
             return ranking;
+        }
+
+        public async Task<List<PlanSemanalDto>> TomarPlanSemanalPorIdAsync(string pacienteId)
+        {
+            var paciente = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
+
+            if (paciente == null || paciente.Paciente == null)
+                throw new Exception("Paciente no encontrado");
+
+            var planSemanal = new List<PlanSemanalDto>();
+
+            foreach (var plan in paciente.Paciente.PlanSemanal)
+            {
+                var comidas = await _comidaRepository.ObtenerComidasPorIdsAsync(plan.Comidas);
+
+                var comidasDto = comidas.Select(comida => new ComidaPlanSemanalDto
+                {
+                    Name = comida.Nombre,
+                    Kcal = comida.Kcal
+                }).ToList();
+
+                planSemanal.Add(new PlanSemanalDto
+                {
+                    Dia = plan.Dia ?? string.Empty,
+                    Comidas = comidasDto
+                });
+            }
+
+            return planSemanal;
+        }
+
+        public async Task<bool> AgregarPlanSemanalAsync(string pacienteId, PlanSemanal plan)
+        {
+            var usuario = await _userRepository.ObtenerUsuarioPorIdAsync(pacienteId);
+
+            if (usuario == null || usuario.Paciente == null)
+                throw new Exception("Paciente no encontrado");
+
+            var planSemanal = usuario.Paciente.PlanSemanal;
+
+            var planExistente = planSemanal.FirstOrDefault(p => p.Dia?.Equals(plan.Dia, StringComparison.OrdinalIgnoreCase) == true);
+
+            if (planExistente != null)
+            {
+                planExistente.Comidas = plan.Comidas;
+            }
+            else
+            {
+                planSemanal.Add(new PlanSemanal
+                {
+                    Dia = plan.Dia,
+                    Comidas = plan.Comidas
+                });
+            }
+
+            await _userRepository.EditarUsuarioAsync(usuario);
+
+            return true;
         }
     }
 }

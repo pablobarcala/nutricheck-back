@@ -15,7 +15,7 @@ namespace NutriCheck.Models
 
         [BsonElement("sexo")]
         public string? Sexo { get; set; }
-        
+
         [BsonElement("actividad")]
         public string? Actividad { get; set; }
 
@@ -42,6 +42,9 @@ namespace NutriCheck.Models
 
         [BsonElement("comidasRegistradas")]
         public List<ComidaRegistrada> ComidasRegistradas { get; set; } = new List<ComidaRegistrada>();
+
+        [BsonElement("planSemanal")]
+        public List<PlanSemanal>? PlanSemanal { get; set; } = new List<PlanSemanal>();
     }
 
     public class ComidaRegistrada
@@ -60,5 +63,14 @@ namespace NutriCheck.Models
 
         [BsonElement("kcal")]
         public int? Kcal { get; set; }
+    }
+
+    public class PlanSemanal
+    {
+        [BsonElement("dia")]
+        public string? Dia { get; set; }
+
+        [BsonElement("comidas")]
+        public List<string> Comidas { get; set; } = new List<string>();
     }
 }
