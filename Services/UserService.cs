@@ -94,6 +94,7 @@ namespace NutriCheck.Backend.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim("email", user.Email),
+                new Claim("nombre", user.Nombre),
                 new Claim("role", user.Rol)
             };
 
@@ -110,14 +111,45 @@ namespace NutriCheck.Backend.Services
 
         public async Task<bool> GuardarDatosPaciente(string userId, GuardarDatosPacienteDto datosPaciente)
         {
-            var datos = new NutriCheck.Models.Paciente
+            var datos = new Paciente
             {
                 Actividad = datosPaciente.Actividad,
                 Altura = datosPaciente.Altura,
                 Sexo = datosPaciente.Sexo,
                 Peso = datosPaciente.Peso,
                 FechaNacimiento = datosPaciente.FechaNacimiento,
-                Calorias = datosPaciente.Calorias
+                Calorias = datosPaciente.Calorias,
+                PlanSemanal = new List<PlanSemanal>()
+                {
+                    new() {
+                        Dia = "Lunes",
+                        Comidas = new List<string>()
+                    },
+                    new() {
+                        Dia = "Martes",
+                        Comidas = new List<string>()
+                    },
+                    new() {
+                        Dia = "Miércoles",
+                        Comidas = new List<string>()
+                    },
+                    new() {
+                        Dia = "Jueves",
+                        Comidas = new List<string>()
+                    },
+                    new() {
+                        Dia = "Viernes",
+                        Comidas = new List<string>()
+                    },
+                    new() {
+                        Dia = "Sábado",
+                        Comidas = new List<string>()
+                    },
+                    new() {
+                        Dia = "Domingo",
+                        Comidas = new List<string>()
+                    },
+                }
             };
 
             return await _userRepository.GuardarDatosPacienteAsync(userId, datos);
@@ -769,20 +801,32 @@ namespace NutriCheck.Backend.Services
             if (usuario == null || usuario.Paciente == null)
                 throw new Exception("Paciente no encontrado");
 
+            // Agrega comidas a la lista si no existen
+            foreach (var comidaId in plan.Comidas)
+            {
+                if (!usuario.Paciente.Comidas.Contains(comidaId))
+                {
+                    usuario.Paciente.Comidas.Add(comidaId);
+                }    
+            }
+            
+            // Actualiza el plan semanal
             var planSemanal = usuario.Paciente.PlanSemanal;
-
             var planExistente = planSemanal.FirstOrDefault(p => p.Dia?.Equals(plan.Dia, StringComparison.OrdinalIgnoreCase) == true);
 
             if (planExistente != null)
             {
-                planExistente.Comidas = plan.Comidas;
+                foreach (var comidaId in plan.Comidas)
+                {
+                    planExistente.Comidas.Add(comidaId);
+                }
             }
             else
             {
                 planSemanal.Add(new PlanSemanal
                 {
                     Dia = plan.Dia,
-                    Comidas = plan.Comidas
+                    Comidas = plan.Comidas.Distinct().ToList()
                 });
             }
 
