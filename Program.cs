@@ -57,7 +57,9 @@ builder.Services.AddCors(options =>
     {
         policy.SetIsOriginAllowed(origin =>
             origin == "http://localhost:3000" ||
-            origin == "https://nutricheck-front.vercel.app")
+            origin == "https://nutricheck-front.vercel.app" ||
+            origin == "https://www.nutricheck.me" ||
+            origin == "https://nutricheck.me")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials();
